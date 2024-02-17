@@ -37,15 +37,15 @@ if DATASET == 'WN18RR':
     train_data = Data(edge_index=all_data.edge_index[:,all_data.train_mask],
                     edge_type=all_data.edge_type[all_data.train_mask],
                     num_edge_types = all_data.num_edge_types,
-                    num_nodes=all_data.num_nodes)
+                    num_nodes=all_data.num_nodes).to(DEVICE)
     val_data = Data(edge_index=all_data.edge_index[:,all_data.val_mask],
                     edge_type=all_data.edge_type[all_data.val_mask],
                     num_edge_types = all_data.num_edge_types,
-                    num_nodes=all_data.num_nodes)
+                    num_nodes=all_data.num_nodes).to(DEVICE)
     test_data = Data(edge_index=all_data.edge_index[:,all_data.test_mask],
                     edge_type=all_data.edge_type[all_data.test_mask],
                     num_edge_types = all_data.num_edge_types,
-                    num_nodes=all_data.num_nodes)
+                    num_nodes=all_data.num_nodes).to(DEVICE)
 
 
 model = ComplEx(
