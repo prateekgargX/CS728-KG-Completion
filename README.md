@@ -5,4 +5,5 @@
 todo: monkey patch the test code to rank based on head also.
 
 - [x] [ComplEx](https://github.com/ttrouill/complex)
+- [ ] Transformer
 - [ ] small-scaled LLM of choice (like [Flan-T5-XXL](https://huggingface.co/google/flan-t5-xxl) through HF-hub or [Phi-1.5](https://huggingface.co/microsoft/phi-1_5))
