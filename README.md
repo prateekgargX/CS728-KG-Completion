@@ -2,7 +2,10 @@
 
 [Problem Statement](https://docs.google.com/document/d/1_uSRcuwKq0E8Z_iJnN63Z2bKxqy6r7fRiwUOIHDjKhU/edit)
 
-todo: monkey patch the test code to rank based on head also.
+todo: 
+  - monkey patch the test code to rank based on head as well
+  - make a requirements file
+  - make everything deterministic with a seed
 
 - [x] [ComplEx](https://github.com/ttrouill/complex)
 - [ ] Transformer
