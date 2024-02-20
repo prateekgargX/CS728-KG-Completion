@@ -127,7 +127,7 @@ class TransformerKG(KGEModel):
         #self.reset_parameters()
         self.vocab_size = num_nodes + num_relations + 4
 
-        d_hid = 2048  # dimension of the feedforward network model in ``nn.TransformerEncoder``
+        d_hid = 256  # dimension of the feedforward network model in ``nn.TransformerEncoder``
         nlayers = 8  # number of ``nn.TransformerEncoderLayer`` in ``nn.TransformerEncoder``
         nhead = 8  # number of heads in ``nn.MultiheadAttention``
         dropout = 0.2  # dropout probability
@@ -202,7 +202,7 @@ NUM_EPOCHS = args.num_epochs # Train for 500 Epochs
 VAL_EVERY = args.val_every # Evaluate every 25 epochs
 DATASET  = args.dataset
 
-EMBED_DIM = 256
+EMBED_DIM = 56 #{256}, more than abd closest to 50 divisible by num_heads
 
 BATCH_SIZE_TRAIN = 1024
 BATCH_SIZE_TEST  = 1024
@@ -260,7 +260,7 @@ def train():
 @torch.no_grad()
 def test_tail(data):
     model.eval()
-    return model.test(model,
+    return test_t(model,
         head_index=data.edge_index[0],
         rel_type=data.edge_type,
         tail_index=data.edge_index[1],

@@ -81,7 +81,7 @@ def train():
 @torch.no_grad()
 def test_tail(data):
     model.eval()
-    return model.test(model,
+    return test_t(model,
         head_index=data.edge_index[0],
         rel_type=data.edge_type,
         tail_index=data.edge_index[1],
