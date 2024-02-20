@@ -250,9 +250,9 @@ def train():
 
 
 @torch.no_grad()
-def test(data):
+def test_tail(data):
     model.eval()
-    return model.test(
+    return model.test(model,
         head_index=data.edge_index[0],
         rel_type=data.edge_type,
         tail_index=data.edge_index[1],
@@ -276,17 +276,29 @@ for epoch in range(1, NUM_EPOCHS+1):
     loss = train()
     print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}')
     if epoch % VAL_EVERY == 0: 
-        rank, mrr, hits = test(val_data)
+        rank, mrr, hits1, hits10 = test_tail(val_data)
         print(f'Epoch: {epoch:03d}, Val Mean Rank: {rank:.2f}, '
-              f'Val MRR: {mrr:.4f}, Val Hits@10: {hits:.4f}')
+              f'Val MRR: {mrr:.4f}, Val Hits@10: {hits10:.4f}')
 
 
 print("Tail removed:")
-rank, mrr, hits_at_10 = test(test_data)
+rank, mrr, hits_at_1, hits_at_10 = test_tail(test_data)
+mAp = calc_map_t(model,
+         head_index=test_data.edge_index[0],
+         rel_type=test_data.edge_type,
+         tail_index=test_data.edge_index[1],
+         batch_size=BATCH_SIZE_TEST)
 print(f'Test Mean Rank: {rank:.2f}, Test MRR: {mrr:.4f}, '
-      f'Test Hits@10: {hits_at_10:.4f}')
+      f'Test Hits@10: {hits_at_10:.4f}',f'Test Hits@1: {hits_at_1:.4f}')
+print(f'mAP: {mAp}')
 
 print("Head removed:")
-rank, mrr, hits_at_10 = test_head(test_data)
+rank, mrr, hits_at_1, hits_at_10 = test_head(test_data)
+mAp = calc_map_h(model,
+         head_index=test_data.edge_index[0],
+         rel_type=test_data.edge_type,
+         tail_index=test_data.edge_index[1],
+         batch_size=BATCH_SIZE_TEST)
 print(f'Test Mean Rank: {rank:.2f}, Test MRR: {mrr:.4f}, '
-      f'Test Hits@10: {hits_at_10:.4f}')
+      f'Test Hits@10: {hits_at_10:.4f}',f'Test Hits@1: {hits_at_1:.4f}')
+print(f'mAP: {mAp}')
