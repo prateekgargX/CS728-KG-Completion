@@ -8,6 +8,8 @@ from torch import nn, Tensor
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from torch.utils.data import dataset
 
+import argparse
+
 class TransformerModel(nn.Module):
 
     def __init__(self, ntoken: int, d_model: int, nhead: int, d_hid: int,
@@ -44,7 +46,7 @@ class TransformerModel(nn.Module):
             """Generate a square causal mask for the sequence. The masked positions are filled with float('-inf').
             Unmasked positions are filled with float(0.0).
             """
-            src_mask = nn.Transformer.generate_square_subsequent_mask(src.shape[1])
+            src_mask = nn.Transformer.generate_square_subsequent_mask(src.shape[1]).to(DEVICE)
         output = self.transformer_encoder(src, src_mask)
         output = self.linear(output)
         return output
@@ -116,10 +118,10 @@ class TransformerKG(KGEModel):
         super().__init__(num_nodes, num_relations, hidden_channels, sparse)
 
         # special tokens introduced by us
-        self.CLS_  = torch.tensor([num_nodes + num_relations + 0])
-        self.SEP1_ = torch.tensor([num_nodes + num_relations + 1])
-        self.SEP2_ = torch.tensor([num_nodes + num_relations + 2])
-        self.END_  = torch.tensor([num_nodes + num_relations + 3]) 
+        self.CLS_  = torch.tensor([num_nodes + num_relations + 0]).to(DEVICE)
+        self.SEP1_ = torch.tensor([num_nodes + num_relations + 1]).to(DEVICE)
+        self.SEP2_ = torch.tensor([num_nodes + num_relations + 2]).to(DEVICE)
+        self.END_  = torch.tensor([num_nodes + num_relations + 3]).to(DEVICE) 
 
 
         #self.reset_parameters()
@@ -188,14 +190,22 @@ from torch_geometric.data import Data
 from mutils import *
 
 import torch.optim as optim
-NUM_EPOCHS = 50 # Train for 500 Epochs
-VAL_EVERY = 10 # Evaluate every 25 epochs
-DATASET  = 'FB15K'
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--num-epochs', type=int, default=500,required=True)
+parser.add_argument('--val-every', type=int, default=25,required=False)
+parser.add_argument('--dataset', type=str.upper, required=True, choices=['FB15K', 'WN18RR'])
+args = parser.parse_args()
+
+NUM_EPOCHS = args.num_epochs # Train for 500 Epochs
+VAL_EVERY = args.val_every # Evaluate every 25 epochs
+DATASET  = args.dataset
 
 EMBED_DIM = 256
 
-BATCH_SIZE_TRAIN = 200
-BATCH_SIZE_TEST  = 50
+BATCH_SIZE_TRAIN = 1024
+BATCH_SIZE_TEST  = 1024
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 PATH = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', f'{DATASET}')
 
@@ -234,10 +244,8 @@ loader = model.loader(
 )
 optimizer = optim.Adagrad(model.parameters(), lr=0.001, weight_decay=1e-6)
 
-
 def train():
     model.train()
-    print("ff")
     total_loss = total_examples = 0
     for head_index, rel_type, tail_index in loader:
         optimizer.zero_grad()
@@ -271,7 +279,8 @@ def test_head(data):
         k=10,
     )
 
-
+# rank, mrr, hits_at_10 = test(test_data)
+# raise
 for epoch in range(1, NUM_EPOCHS+1):
     loss = train()
     print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}')
